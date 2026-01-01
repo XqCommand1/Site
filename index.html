@@ -1,5 +1,4 @@
 <!doctype html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -85,7 +84,7 @@ html,body{
   position:fixed;
   top:18px;
   left:50%;
-  transform:translateX(-50%);
+  transform:translateX(-50%) translateY(-20px);
   display:flex;
   gap:10px;
   align-items:center;
@@ -95,6 +94,13 @@ html,body{
   border:1px solid var(--border);
   border-radius:999px;
   z-index:10;
+  opacity:0;
+  animation:revealNav .7s ease forwards;
+  animation-play-state:paused;
+}
+
+@keyframes revealNav{
+  to{opacity:1;transform:translateX(-50%) translateY(0)}
 }
 
 .navbar button{
@@ -131,6 +137,19 @@ section{
   align-items:center;
   justify-content:center;
   padding:110px 20px;
+  opacity:0;
+  transform:translateY(18px) scale(.98);
+  animation:reveal .9s ease forwards;
+  animation-play-state:paused;
+}
+
+#home{animation-delay:.15s}
+#about{animation-delay:.25s}
+#skills{animation-delay:.35s}
+#projects{animation-delay:.45s}
+
+@keyframes reveal{
+  to{opacity:1;transform:translateY(0) scale(1)}
 }
 
 .card{
@@ -142,12 +161,6 @@ section{
   border-radius:28px;
   border:1px solid var(--border);
   box-shadow:0 30px 80px rgba(0,0,0,.6);
-  animation:fadeUp .9s ease forwards;
-}
-
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(20px)}
-  to{opacity:1;transform:translateY(0)}
 }
 
 .card h2{
@@ -203,7 +216,7 @@ section{
   display:flex;
   align-items:center;
   justify-content:center;
-  border-radius:16px;
+  border-radius:50%;
   background:var(--glass);
   border:1px solid var(--border);
   transition:.25s;
@@ -260,12 +273,16 @@ section{
   padding-top:48px;
 }
 
+body.reveal section,
+body.reveal .navbar{
+  animation-play-state:running;
+}
+
 @media(max-width:600px){
   .card{padding:38px 24px}
   .name{font-size:1.9rem}
 }
 </style>
-
 </head>
 
 <body>
@@ -275,7 +292,6 @@ section{
 </div>
 
 <video id="bgVideo" class="video-bg" src="prettymusic.mp4" loop playsinline></video>
-
 <div class="overlay"></div>
 
 <nav class="navbar">
@@ -334,18 +350,10 @@ section{
 <section id="projects">
   <div class="card">
     <h2>Projects</h2>
-    <div class="project" onclick="openProject('Bandit Obfuscator','Lua VM-based obfuscator built for security research and Lua bytecode experimentation.')">
-      Bandit Obfuscator
-    </div>
-    <div class="project" onclick="openProject('Zen','Experimental tool / game project focused on systems and mechanics testing.')">
-      Zen
-    </div>
-    <div class="project" onclick="openProject('The Void','Internal experimental research project.')">
-      The Void
-    </div>
-    <div class="project" onclick="openProject('Private research projects','Private Research\nNon-public security research')">
-      Private research projects
-    </div>
+    <div class="project" onclick="openProject('Bandit Obfuscator','Lua VM-based obfuscator built for security research and Lua bytecode experimentation.')">Bandit Obfuscator</div>
+    <div class="project" onclick="openProject('Zen','Experimental tool / game project focused on systems and mechanics testing.')">Zen</div>
+    <div class="project" onclick="openProject('The Void','Internal experimental research project.')">The Void</div>
+    <div class="project" onclick="openProject('Private research projects','Private Research\nNon-public security research')">Private research projects</div>
   </div>
 </section>
 
@@ -366,12 +374,16 @@ const modal=document.getElementById("modal")
 const modalTitle=document.getElementById("modalTitle")
 const modalText=document.getElementById("modalText")
 
-enter.onclick=()=>{ enter.classList.add("hidden"); video.play() }
+enter.onclick=()=>{
+  enter.classList.add("hidden")
+  video.play()
+  document.body.classList.add("reveal")
+}
 
 volume.oninput=()=>video.volume=volume.value
 
 buttons.forEach(btn=>{
-  btn.onclick=()=>{ document.getElementById(btn.dataset.section).scrollIntoView({behavior:"smooth"}) }
+  btn.onclick=()=>{document.getElementById(btn.dataset.section).scrollIntoView({behavior:"smooth"})}
 })
 
 const observer=new IntersectionObserver(entries=>{
