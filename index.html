@@ -1,10 +1,405 @@
-<!DOCTYPE html>
-<html>
-<title>HTML Tutorial</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bandit</title>
+
+<style>
+:root{
+  --bg:#000;
+  --glass:rgba(255,255,255,.12);
+  --border:rgba(255,255,255,.22);
+  --text:#fff;
+  --muted:rgba(255,255,255,.7);
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+.enter{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+  cursor:pointer;
+  transition:opacity .8s ease,visibility .8s ease;
+}
+
+.enter.hidden{
+  opacity:0;
+  visibility:hidden;
+}
+
+.enter span{
+  font-size:1.1rem;
+  letter-spacing:3px;
+  opacity:.8;
+  animation:pulse 1.6s ease-in-out infinite, floatText 4s ease-in-out infinite;
+}
+
+@keyframes pulse{
+  0%,100%{opacity:.4}
+  50%{opacity:1}
+}
+
+@keyframes floatText{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-6px)}
+}
+
+.video-bg{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:-2;
+}
+
+/* Flashlight overlay */
+.flashlight-overlay {
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:rgba(0,0,0,0.85); /* much darker overall overlay */
+  transition: background 0.05s ease;
+  z-index:5;
+}
+
+.navbar{
+  position:fixed;
+  top:18px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:10px 16px;
+  background:var(--glass);
+  backdrop-filter:blur(16px);
+  border:1px solid var(--border);
+  border-radius:999px;
+  z-index:10;
+}
+
+.navbar button{
+  background:none;
+  border:none;
+  color:var(--text);
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:.9rem;
+  transition:.25s;
+}
+
+.navbar button.active,
+.navbar button:hover{
+  background:rgba(255,255,255,.25);
+}
+
+.volume{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  background:rgba(255,255,255,.14);
+  border:1px solid var(--border);
+  border-radius:999px;
+}
+
+.volume input{width:80px}
+
+section{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:110px 20px;
+}
+
+.card{
+  width:100%;
+  max-width:440px;
+  padding:44px 36px 40px;
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(24px);
+  border-radius:28px;
+  border:1px solid var(--border);
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+  animation:fadeUp .9s ease forwards;
+}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.card h2{
+  margin-bottom:18px;
+  text-align:center;
+  letter-spacing:1px;
+}
+
+.avatar{
+  width:110px;
+  height:110px;
+  border-radius:50%;
+  margin:0 auto 18px;
+  overflow:hidden;
+  border:2px solid var(--border);
+}
+
+.avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.name{
+  font-size:2.3rem;
+  letter-spacing:3px;
+  text-align:center;
+  text-transform:lowercase;
+}
+
+.role{
+  text-align:center;
+  margin:10px 0 6px;
+  color:var(--muted);
+}
+
+.location{
+  text-align:center;
+  font-size:.9rem;
+  opacity:.85;
+  margin-bottom:20px;
+}
+
+.links{
+  display:flex;
+  justify-content:center;
+  gap:16px;
+}
+
+.links a{
+  width:48px;
+  height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:16px;
+  background:var(--glass);
+  border:1px solid var(--border);
+  transition:.25s;
+}
+
+.links a:hover{
+  background:rgba(255,255,255,.3);
+}
+
+.links img{
+  width:28px;
+  height:28px;
+}
+
+.about-text{
+  font-size:.95rem;
+  line-height:1.75;
+  color:var(--muted);
+  text-align:center;
+}
+
+.skills{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:12px;
+}
+
+.project{
+  padding:16px;
+  border-radius:16px;
+  background:var(--glass);
+  border:1px solid var(--border);
+  margin-bottom:14px;
+  transition:.25s;
+}
+
+.project:hover{
+  background:rgba(255,255,255,.28);
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:20;
+}
+
+.modal .card{
+  max-width:480px;
+  padding-top:48px;
+}
+
+@media(max-width:600px){
+  .card{padding:38px 24px}
+  .name{font-size:1.9rem}
+}
+</style>
+</head>
+
 <body>
 
-<h1>This is a heading</h1>
-<p>This is a paragraph.</p>
+<div class="enter" id="enter">
+  <span>CLICK ANYWHERE TO ENTER</span>
+</div>
+
+<video id="bgVideo" class="video-bg" src="smilevid.mp4" loop playsinline></video>
+<div class="flashlight-overlay"></div>
+
+<nav class="navbar">
+  <button data-section="home" class="active">Home</button>
+  <button data-section="about">About</button>
+  <button data-section="skills">Skills</button>
+  <button data-section="projects">Projects</button>
+  <div class="volume">
+    🔊
+    <input id="volume" type="range" min="0" max="1" step="0.01" value="0.8">
+  </div>
+</nav>
+
+<section id="home">
+  <div class="card">
+    <div class="avatar"><img src="9855d7e3b9780976.png"></div>
+    <div class="name">bandit</div>
+    <div class="role">Security researcher · vulnerability hunter</div>
+    <div class="location">📍 Bulgaria</div>
+    <div class="links">
+      <a href="https://discord.com/users/1198180276531101706" target="_blank">
+        <img src="discord-logo-discord-icon-transp.png">
+      </a>
+      <a href="https://www.roblox.com/users/1439758104/profile" target="_blank">
+        <img src="images__5_-removebg-preview.png">
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="card">
+    <h2>About</h2>
+    <p class="about-text">
+      I focus on security research, reverse engineering and VM-based obfuscation.
+      My work revolves around low-level Lua internals, bytecode manipulation,
+      and building experimental tools strictly for educational and research purposes.
+    </p>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="card">
+    <h2>Skills</h2>
+    <div class="skills">
+      <div class="project">Lua 5.1</div>
+      <div class="project">Reverse Engineering</div>
+      <div class="project">VM Obfuscation</div>
+      <div class="project">Exploit Research</div>
+      <div class="project">Roblox Internals</div>
+      <div class="project">Security Tooling</div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="card">
+    <h2>Projects</h2>
+    <div class="project" onclick="openProject('Bandit Obfuscator','Lua VM-based obfuscator built for security research and Lua bytecode experimentation.')">
+      Bandit Obfuscator
+    </div>
+    <div class="project" onclick="openProject('Zen','Experimental tool / game project focused on systems and mechanics testing.')">
+      Zen
+    </div>
+    <div class="project" onclick="openProject('The Void','Internal experimental research project.')">
+      The Void
+    </div>
+    <div class="project" onclick="openProject('Private research projects','Private Research\nNon-public security research')">
+      Private research projects
+    </div>
+  </div>
+</section>
+
+<div class="modal" id="modal" onclick="closeModal(event)">
+  <div class="card">
+    <h2 id="modalTitle"></h2>
+    <p class="about-text" id="modalText"></p>
+  </div>
+</div>
+
+<script>
+const enter=document.getElementById("enter")
+const video=document.getElementById("bgVideo")
+const volume=document.getElementById("volume")
+const buttons=document.querySelectorAll(".navbar button[data-section]")
+const sections=document.querySelectorAll("section")
+const modal=document.getElementById("modal")
+const modalTitle=document.getElementById("modalTitle")
+const modalText=document.getElementById("modalText")
+const flashlight=document.querySelector('.flashlight-overlay')
+
+enter.onclick=()=>{ enter.classList.add("hidden"); video.play() }
+volume.oninput=()=>video.volume=volume.value
+
+buttons.forEach(btn=>{
+  btn.onclick=()=>{ document.getElementById(btn.dataset.section).scrollIntoView({behavior:"smooth"}) }
+})
+
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      buttons.forEach(b=>b.classList.remove("active"))
+      const active=document.querySelector(`.navbar button[data-section="${entry.target.id}"]`)
+      if(active) active.classList.add("active")
+    }
+  })
+},{threshold:.6})
+
+sections.forEach(sec=>observer.observe(sec))
+
+function openProject(title,text){
+  modalTitle.textContent=title
+  modalText.textContent=text
+  modal.style.display="flex"
+}
+
+function closeModal(e){
+  if(e.target===modal) modal.style.display="none"
+}
+
+// Flashlight effect - bigger radius, stronger transparency
+document.addEventListener('mousemove', e => {
+  flashlight.style.background = `
+    radial-gradient(circle 250px at ${e.clientX}px ${e.clientY}px, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 90%)
+  `;
+})
+</script>
 
 </body>
 </html>
